@@ -1,0 +1,37 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100%;
+    overflow: hidden;
+}
+
+#containerCanvas {
+    height: 100%;
+    width: 100%;
+    position: absolute; 
+     background-color: #445899;
+}
+
+/* 
+#innerDIV {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+   
+} */
+
+#canvasMain {
+    position: absolute;
+    padding: 0;
+    margin: 0 auto;
+    z-index: 10;
+    box-sizing: border-box;
+    background-color: #333333;
+    outline: 4px solid #111111; 
+    outline-offset: -4px;
+    /* padding: 0px; */
+}
