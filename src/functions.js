@@ -7,7 +7,7 @@ var ctx = canvas.getContext( "2d" );
 //Graph variables
 var GRAPH_TOP = 25;
 var GRAPH_BOTTOM = 300;
-var GRAPH_LEFT = 75;
+var GRAPH_LEFT = 50;
 var GRAPH_RIGHT = 615;
    
 var GRAPH_HEIGHT = GRAPH_BOTTOM - GRAPH_TOP; 
@@ -32,8 +32,11 @@ ctx.stroke();
 //Draw faint ref lines
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP, GRAPH_RIGHT, GRAPH_TOP);
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/4)*1, GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/4)*1);
+PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*1, largestElement*0.75);
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/4)*2, GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/4)*2);
+PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*2, largestElement*0.5);
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/4)*3, GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/4)*3);
+PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*3, largestElement*0.25);
 
 //Draw the 13kb limit
 DrawLimitLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestElement-13), GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestElement-13));
@@ -51,15 +54,28 @@ DrawDataPlot();
 /////////////////////////////////////////////////////
 
 function PrintAxisValues() {
-    ctx.font = "bold 14px Calibri";
+    ctx.font = "14px Calibri";
+    ctx.fillStyle = "#888888";
     ctx.fillText(largestElement, GRAPH_LEFT - 20, GRAPH_TOP);
     ctx.fillText("0", GRAPH_LEFT - 20, GRAPH_BOTTOM);
 }
 
 function PrintAxisHeadings() {
-    ctx.font = "bold 14px Calibri";
-    ctx.fillText("Kilobytes", GRAPH_LEFT - 65, GRAPH_HEIGHT/2 + GRAPH_TOP);
-    ctx.fillText("Days 1-31", GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 30);
+    ctx.font = "bold 18px Calibri";
+    ctx.fillStyle = "#000000";
+    ctx.fillText("kb", GRAPH_LEFT - 42, GRAPH_HEIGHT/2 + GRAPH_TOP);
+    ctx.fillText("Days 1-31", GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 40);
+}
+
+function PrintXAxisValue(x, val) { 
+    ctx.font = "10px Calibri";
+    ctx.fillStyle = "#888888";
+    ctx.fillText(val, x, GRAPH_BOTTOM + 14);
+}
+function PrintYAxisValue(y, val) { 
+    ctx.font = "10px Calibri";
+    ctx.fillStyle = "#888888";
+    ctx.fillText(val, GRAPH_LEFT - 20, y);
 }
 
 function DrawRefLine(startX, startY, endX, endY) {
@@ -79,6 +95,11 @@ function DrawLimitLine(startX, startY, endX, endY) {
     ctx.moveTo( startX, startY );
     ctx.lineTo( endX, endY );
     ctx.stroke();
+
+    //draw red 13 text
+    ctx.font = "bold 10px Calibri";
+    ctx.fillStyle = "#FF8888";
+    ctx.fillText("13", GRAPH_LEFT - 20, startY);
 }
 
 function DrawDataDiamond(x, y, size) {
@@ -97,6 +118,8 @@ function DrawDataDiamond(x, y, size) {
     ctx.fillStyle = "black";
     ctx.fill();
     ctx.restore();
+
+    ctx.moveTo(x, y); //seems needed to get graph drawing from center of points, fix this
 }
 
 function DrawDataPlot() {
@@ -108,15 +131,19 @@ function DrawDataPlot() {
     var pointY = (GRAPH_HEIGHT - dataArr[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
     ctx.moveTo(pointX, pointY);
     DrawDataDiamond(pointX, pointY, 4);
+    PrintXAxisValue(pointX, 1);
     
     //Loop over each datapoint
-    for( var i = 1; i < arrayLen; i++ ){
-        pointX = GRAPH_RIGHT / arrayLen * i + GRAPH_LEFT;
-        pointY = (GRAPH_HEIGHT - dataArr[ i ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
+    for(var i = 1; i < arrayLen; i++ ){
+        pointX = (GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT; //-40 here scales down the axis to fit
+        pointY = (GRAPH_HEIGHT - dataArr[i] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
         ctx.lineTo(pointX, pointY);
         //Draw the graph  
         ctx.stroke();
+
         DrawDataDiamond(pointX, pointY, 4);
+        PrintXAxisValue(pointX, i+1);
+        //console.log("checking value: " + i);
     }
 }
 
@@ -125,7 +152,7 @@ function FindLargestElement() {
     for( var i = 0; i < arrayLen; i++ ){  
         if( dataArr[ i ] > largestElement ){  
             largestElement = dataArr[ i ];
-            pos = i;  
+            pos = i;
         }  
     }  
     //if largest point below 13, set 13kb as the upper limit of the graph

@@ -3,7 +3,7 @@ html {
 }
 
 body {
-    margin: 0;
+    margin: 10;
     min-height: 100%;
     overflow: hidden;
 }
@@ -30,7 +30,7 @@ body {
     margin: 0 auto;
     z-index: 10;
     box-sizing: border-box;
-    background-color: #CCCCCC;
+    background-color: #EEEEEE;
     outline: 2px solid #999999; 
     outline-offset: -2px;
     /* padding: 0px; */
