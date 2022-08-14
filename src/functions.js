@@ -1,26 +1,27 @@
 /////////////////////////////////////////////////////
 //Graphing Setup
 /////////////////////////////////////////////////////
-var canvas = document.getElementById( "canvasMain" );  
-var ctx = canvas.getContext( "2d" );  
-   
+var canvas = document.getElementById( "canvasMain" );
+var ctx = canvas.getContext( "2d" );
+
 //Graph variables
 var GRAPH_TOP = 25;
 var GRAPH_BOTTOM = 300;
-var GRAPH_LEFT = 50;
-var GRAPH_RIGHT = 615;
+var GRAPH_LEFT = 60;
+var GRAPH_RIGHT = 766;
    
 var GRAPH_HEIGHT = GRAPH_BOTTOM - GRAPH_TOP; 
 var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
 //Setup test data   
-var dataArr = [ 10, 24, 18, 16, 13 ];  
+// var dataArr = [ 10, 24, 18, 16, 13 ];  
+var dataArr = [ 45, ];  
 var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
 FindLargestElement();
 
 //Clear canvas  
-ctx.clearRect( 0, 0, 500, 400);
+ctx.clearRect( 0, 0, canvas.width, canvas.height);
 
 //Draw primary X and Y axis  
 ctx.beginPath();  
@@ -63,19 +64,24 @@ function PrintAxisValues() {
 function PrintAxisHeadings() {
     ctx.font = "bold 18px Calibri";
     ctx.fillStyle = "#000000";
-    ctx.fillText("kb", GRAPH_LEFT - 42, GRAPH_HEIGHT/2 + GRAPH_TOP);
+    ctx.fillText("kb", GRAPH_LEFT - 52, GRAPH_HEIGHT/2 + GRAPH_TOP);
     ctx.fillText("Days 1-31", GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 40);
 }
 
-function PrintXAxisValue(x, val) { 
-    ctx.font = "10px Calibri";
-    ctx.fillStyle = "#888888";
+function PrintXAxisValue(x, val, bold) {
+    if(bold) {
+        ctx.font = "bold 12px Calibri";
+        ctx.fillStyle = "#000000";
+    } else {
+        ctx.font = "10px Calibri";
+        ctx.fillStyle = "#888888";
+    }
     ctx.fillText(val, x, GRAPH_BOTTOM + 14);
 }
 function PrintYAxisValue(y, val) { 
     ctx.font = "10px Calibri";
     ctx.fillStyle = "#888888";
-    ctx.fillText(val, GRAPH_LEFT - 20, y);
+    ctx.fillText(val, GRAPH_LEFT - 26, y);
 }
 
 function DrawRefLine(startX, startY, endX, endY) {
@@ -131,7 +137,7 @@ function DrawDataPlot() {
     var pointY = (GRAPH_HEIGHT - dataArr[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
     ctx.moveTo(pointX, pointY);
     DrawDataDiamond(pointX, pointY, 4);
-    PrintXAxisValue(pointX, 1);
+    PrintXAxisValue(pointX, 1, true);
     
     //Loop over each datapoint
     for(var i = 1; i < arrayLen; i++ ){
@@ -142,7 +148,7 @@ function DrawDataPlot() {
         ctx.stroke();
 
         DrawDataDiamond(pointX, pointY, 4);
-        PrintXAxisValue(pointX, i+1);
+        PrintXAxisValue(pointX, i+1, false);
         //console.log("checking value: " + i);
     }
 }
