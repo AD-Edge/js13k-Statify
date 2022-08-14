@@ -13,9 +13,9 @@ var GRAPH_RIGHT = 766;
 var GRAPH_HEIGHT = GRAPH_BOTTOM - GRAPH_TOP; 
 var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
-//Setup test data   
-// var dataArr = [ 10, 24, 18, 16, 13 ];  
-var dataArr = [ 45, ];  
+//Setup test data
+// var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
+var dataArr = [ 45, ];
 var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
 FindLargestElement();
