@@ -14,10 +14,15 @@ var GRAPH_HEIGHT = GRAPH_BOTTOM - GRAPH_TOP;
 var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
 //Setup test data
-// var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
-var dataArr = [ 45, ];
+var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
+//var dataArr = [ 45, 43, 30, 25];
+var dataArrOp = [ 10, 12, 27, 24, 12, 12, 13, 9, 6, 5, 9, 10, 10, 10, 12, 8 , 7, 6, 7, 8 ];
 var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
+
+//TODO
+//add toggle for max value graph displays
+
 FindLargestElement();
 
 //Clear canvas  
@@ -46,9 +51,11 @@ DrawLimitLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestEl
 PrintAxisHeadings();
 PrintAxisValues();
 
-//Draw the graph
-DrawDataPlot();
+//Draw the uncompressed data graph
+DrawDataPlot_UNCOMPRESSED();
 
+//Draw the optimized data graph
+DrawDataPlot_OPTIMIZED();
 
 /////////////////////////////////////////////////////
 //STATIFY FUNCTIONS
@@ -108,7 +115,7 @@ function DrawLimitLine(startX, startY, endX, endY) {
     ctx.fillText("13", GRAPH_LEFT - 20, startY);
 }
 
-function DrawDataDiamond(x, y, size) {
+function DrawDataDiamond(x, y, size, color) {
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(x, (y)-size);
@@ -121,22 +128,23 @@ function DrawDataDiamond(x, y, size) {
     // closing the path automatically creates
     // the top right edge
     ctx.closePath();
-    ctx.fillStyle = "black";
+    ctx.fillStyle = color;
     ctx.fill();
     ctx.restore();
 
     ctx.moveTo(x, y); //seems needed to get graph drawing from center of points, fix this
 }
 
-function DrawDataPlot() {
+function DrawDataPlot_UNCOMPRESSED() {
     ctx.beginPath();
     ctx.lineJoin = "round";
-    ctx.strokeStyle = "black";
+    ctx.setLineDash([5, 15]);
+    ctx.strokeStyle = "blue";
     //Add first point in the graph
     var pointX = GRAPH_LEFT;
     var pointY = (GRAPH_HEIGHT - dataArr[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
     ctx.moveTo(pointX, pointY);
-    DrawDataDiamond(pointX, pointY, 4);
+    DrawDataDiamond(pointX, pointY, 4, 'blue');
     PrintXAxisValue(pointX, 1, true);
     
     //Loop over each datapoint
@@ -147,7 +155,32 @@ function DrawDataPlot() {
         //Draw the graph  
         ctx.stroke();
 
-        DrawDataDiamond(pointX, pointY, 4);
+        DrawDataDiamond(pointX, pointY, 4, 'blue');
+        PrintXAxisValue(pointX, i+1, false);
+        //console.log("checking value: " + i);
+    }
+}
+function DrawDataPlot_OPTIMIZED() {
+    ctx.beginPath();
+    ctx.lineJoin = "round";
+    ctx.setLineDash([]);
+    ctx.strokeStyle = "black";
+    //Add first point in the graph
+    var pointX = GRAPH_LEFT;
+    var pointY = (GRAPH_HEIGHT - dataArrOp[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
+    ctx.moveTo(pointX, pointY);
+    DrawDataDiamond(pointX, pointY, 4, 'black');
+    PrintXAxisValue(pointX, 1, true);
+    
+    //Loop over each datapoint
+    for(var i = 1; i < arrayLen; i++ ){
+        pointX = (GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT; //-40 here scales down the axis to fit
+        pointY = (GRAPH_HEIGHT - dataArrOp[i] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
+        ctx.lineTo(pointX, pointY);
+        //Draw the graph  
+        ctx.stroke();
+
+        DrawDataDiamond(pointX, pointY, 4, 'black');
         PrintXAxisValue(pointX, i+1, false);
         //console.log("checking value: " + i);
     }

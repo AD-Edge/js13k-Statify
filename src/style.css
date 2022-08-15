@@ -25,7 +25,7 @@ body {
 #canvasMain {
     z-index: 10;
     background-color: #EEEEEE;
-    outline: 2px solid #999999; 
+    outline: 2px solid #333; 
     outline-offset: -2px;
     /* padding: 0px; */
 }
