@@ -15,7 +15,8 @@ var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
 //Setup test data
 var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
-//var dataArr = [ 45, 43, 30, 25];
+// var dataArr = [ 45, ];
+// var dataArrOp = [ 11, ];
 var dataArrOp = [ 10, 12, 27, 24, 12, 12, 13, 9, 6, 5, 9, 10, 10, 10, 12, 8 , 7, 6, 7, 8 ];
 var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
@@ -50,6 +51,7 @@ DrawLimitLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestEl
 //Draw graph titles and text
 PrintAxisHeadings();
 PrintAxisValues();
+PrintLegend();
 
 //Draw the uncompressed data graph
 DrawDataPlot_UNCOMPRESSED();
@@ -73,6 +75,18 @@ function PrintAxisHeadings() {
     ctx.fillStyle = "#000000";
     ctx.fillText("kb", GRAPH_LEFT - 52, GRAPH_HEIGHT/2 + GRAPH_TOP);
     ctx.fillText("Days 1-31", GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 40);
+}
+
+function PrintLegend() {
+    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 30, 5, 'blue');
+    ctx.font = "bold 12px Calibri";
+    ctx.fillStyle = 'blue';
+    ctx.fillText('Uncompressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 35,);
+    
+    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 45, 5, 'black');
+    ctx.font = "bold 12px Calibri";
+    ctx.fillStyle = 'black';
+    ctx.fillText('Compressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 50,);
 }
 
 function PrintXAxisValue(x, val, bold) {
