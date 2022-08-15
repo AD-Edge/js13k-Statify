@@ -1,3 +1,8 @@
+// A graph/data-renderer for use in competitions like #js13k
+// Built using HTML/Canvas/JS
+// First Created By Alex Delderfield, 2022
+// https://twitter.com/Alex_ADEdge
+
 /////////////////////////////////////////////////////
 //Graphing Setup
 /////////////////////////////////////////////////////
@@ -13,20 +18,27 @@ var GRAPH_RIGHT = 766;
 var GRAPH_HEIGHT = GRAPH_BOTTOM - GRAPH_TOP; 
 var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
-//Setup test data
+//Setup test/demo data
 var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
+var dataArrOp = [ 10, 12, 27, 24, 12, 12, 13, 9, 6, 5, 9, 10, 10, 10, 12, 8 , 7, 6, 7, 8 ];
+
+//Setup current user data
+//TODO - generate these arrays automatically via batch script, manually input for now
 // var dataArr = [ 45, ];
 // var dataArrOp = [ 11, ];
-var dataArrOp = [ 10, 12, 27, 24, 12, 12, 13, 9, 6, 5, 9, 10, 10, 10, 12, 8 , 7, 6, 7, 8 ];
+//other data required
 var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
 
-//TODO
-//add toggle for max value graph displays
-
+//Initial process of data
 FindLargestElement();
 
-//Clear canvas  
+//TODO
+//Add toggle for max value graph displays
+//If null, have no limit on Y
+var maxYVal = null;
+
+//Clear Canvas
 ctx.clearRect( 0, 0, canvas.width, canvas.height);
 
 //Draw primary X and Y axis  
@@ -36,7 +48,7 @@ ctx.lineTo( GRAPH_LEFT, GRAPH_BOTTOM );
 ctx.lineTo( GRAPH_RIGHT, GRAPH_BOTTOM );  
 ctx.stroke(); 
 
-//Draw faint ref lines
+//Draw faint ref lines and print values
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP, GRAPH_RIGHT, GRAPH_TOP);
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/4)*1, GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/4)*1);
 PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*1, largestElement*0.75);
@@ -45,10 +57,10 @@ PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*2, largestElement*0.5);
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/4)*3, GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/4)*3);
 PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*3, largestElement*0.25);
 
-//Draw the 13kb limit
+//Draw the 13kb limit line
 DrawLimitLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestElement-13), GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestElement-13));
 
-//Draw graph titles and text
+//Draw graph titles and text and legend
 PrintAxisHeadings();
 PrintAxisValues();
 PrintLegend();
@@ -59,17 +71,19 @@ DrawDataPlot_UNCOMPRESSED();
 //Draw the optimized data graph
 DrawDataPlot_OPTIMIZED();
 
+//End
+
 /////////////////////////////////////////////////////
 //STATIFY FUNCTIONS
 /////////////////////////////////////////////////////
 
+//Prints Axis headings
 function PrintAxisValues() {
     ctx.font = "14px Calibri";
     ctx.fillStyle = "#888888";
     ctx.fillText(largestElement, GRAPH_LEFT - 20, GRAPH_TOP);
     ctx.fillText("0", GRAPH_LEFT - 20, GRAPH_BOTTOM);
 }
-
 function PrintAxisHeadings() {
     ctx.font = "bold 18px Calibri";
     ctx.fillStyle = "#000000";
@@ -77,6 +91,7 @@ function PrintAxisHeadings() {
     ctx.fillText("Days 1-31", GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 40);
 }
 
+//Legend which specifies the 2x types of graph viewed
 function PrintLegend() {
     DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 30, 5, 'blue');
     ctx.font = "bold 12px Calibri";
@@ -89,6 +104,7 @@ function PrintLegend() {
     ctx.fillText('Compressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 50,);
 }
 
+//For printing X Axis values (days)
 function PrintXAxisValue(x, val, bold) {
     if(bold) {
         ctx.font = "bold 12px Calibri";
@@ -99,21 +115,24 @@ function PrintXAxisValue(x, val, bold) {
     }
     ctx.fillText(val, x, GRAPH_BOTTOM + 14);
 }
+//For printing Y Axis values (kbs)
 function PrintYAxisValue(y, val) { 
     ctx.font = "10px Calibri";
     ctx.fillStyle = "#888888";
     ctx.fillText(val, GRAPH_LEFT - 26, y);
 }
 
+//Draw a reference line (lighter line) to break up the graph
 function DrawRefLine(startX, startY, endX, endY) {
-    // draw reference line at the top of the graph  
     ctx.beginPath();
-    // set light grey color for reference lines  
-    ctx.strokeStyle = "#BBB";
+    ctx.strokeStyle = "#BBB"; //Light grey for reference lines  
     ctx.moveTo( startX, startY );
     ctx.lineTo( endX, endY );
     ctx.stroke();
 }
+
+//Draws red limit line at 13kb level
+//Also labels it
 function DrawLimitLine(startX, startY, endX, endY) {
     // draw reference line at the top of the graph  
     ctx.beginPath();
@@ -123,12 +142,16 @@ function DrawLimitLine(startX, startY, endX, endY) {
     ctx.lineTo( endX, endY );
     ctx.stroke();
 
+    //TODO handle graphs which start out under 13kb
+
     //draw red 13 text
     ctx.font = "bold 10px Calibri";
     ctx.fillStyle = "#FF8888";
     ctx.fillText("13", GRAPH_LEFT - 20, startY);
 }
 
+//Draw a diamond shape
+//requires x/y location, scale to draw diamond and colour
 function DrawDataDiamond(x, y, size, color) {
     ctx.save();
     ctx.beginPath();
@@ -149,11 +172,14 @@ function DrawDataDiamond(x, y, size, color) {
     ctx.moveTo(x, y); //seems needed to get graph drawing from center of points, fix this
 }
 
+//Plots the data from dataArr
+//Uncompressed (blue line) data
 function DrawDataPlot_UNCOMPRESSED() {
     ctx.beginPath();
     ctx.lineJoin = "round";
     ctx.setLineDash([5, 15]);
     ctx.strokeStyle = "blue";
+
     //Add first point in the graph
     var pointX = GRAPH_LEFT;
     var pointY = (GRAPH_HEIGHT - dataArr[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
@@ -161,7 +187,7 @@ function DrawDataPlot_UNCOMPRESSED() {
     DrawDataDiamond(pointX, pointY, 4, 'blue');
     PrintXAxisValue(pointX, 1, true);
     
-    //Loop over each datapoint
+    //Loop over each other datapoint
     for(var i = 1; i < arrayLen; i++ ){
         pointX = (GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT; //-40 here scales down the axis to fit
         pointY = (GRAPH_HEIGHT - dataArr[i] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
@@ -174,11 +200,15 @@ function DrawDataPlot_UNCOMPRESSED() {
         //console.log("checking value: " + i);
     }
 }
+
+//Plots the data from dataArrOp
+//Compressed (black line) data
 function DrawDataPlot_OPTIMIZED() {
     ctx.beginPath();
     ctx.lineJoin = "round";
     ctx.setLineDash([]);
     ctx.strokeStyle = "black";
+
     //Add first point in the graph
     var pointX = GRAPH_LEFT;
     var pointY = (GRAPH_HEIGHT - dataArrOp[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
@@ -186,7 +216,7 @@ function DrawDataPlot_OPTIMIZED() {
     DrawDataDiamond(pointX, pointY, 4, 'black');
     PrintXAxisValue(pointX, 1, true);
     
-    //Loop over each datapoint
+    //Loop over each other datapoint
     for(var i = 1; i < arrayLen; i++ ){
         pointX = (GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT; //-40 here scales down the axis to fit
         pointY = (GRAPH_HEIGHT - dataArrOp[i] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
@@ -200,6 +230,8 @@ function DrawDataPlot_OPTIMIZED() {
     }
 }
 
+//Used during setup, finds the largest element in the array
+//This sets the maximum Y value the graph will render
 function FindLargestElement() {
     var pos = 0;
     for( var i = 0; i < arrayLen; i++ ){  
@@ -207,8 +239,10 @@ function FindLargestElement() {
             largestElement = dataArr[ i ];
             pos = i;
         }  
-    }  
-    //if largest point below 13, set 13kb as the upper limit of the graph
+    }
+
+    //TODO if largest point below 13, set 13kb as the upper limit of the graph
+    //TODO if largest point is above maximum, trim
 
     console.log("Largest data-point in array is " + largestElement + "kb, on day " + (pos+1));
 }
