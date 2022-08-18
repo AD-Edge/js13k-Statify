@@ -19,16 +19,17 @@ var GRAPH_HEIGHT = GRAPH_BOTTOM - GRAPH_TOP;
 var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
 //Setup test/demo data
-var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
-var dataArrOp = [ 10, 12, 27, 24, 12, 12, 13, 9, 6, 5, 9, 10, 10, 10, 12, 8 , 7, 6, 7, 8 ];
+// var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
+// var dataArrOp = [ 10, 12, 27, 24, 12, 12, 13, 9, 6, 5, 9, 10, 10, 10, 12, 8 , 7, 6, 7, 8 ];
 
 //Setup current user data
 //TODO - generate these arrays automatically via batch script, manually input for now
-// var dataArr = [ 45, ];
-// var dataArrOp = [ 11, ];
+var dataArr = [ 45, 51, 23, 24];
+var dataArrOp = [ 11, 12, 7, 7 ];
 //other data required
 var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
+var currentDay = 4;
 
 //Initial process of data
 FindLargestElement();
@@ -51,11 +52,11 @@ ctx.stroke();
 //Draw faint ref lines and print values
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP, GRAPH_RIGHT, GRAPH_TOP);
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/4)*1, GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/4)*1);
-PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*1, largestElement*0.75);
+PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*1, Math.ceil(largestElement*0.75));
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/4)*2, GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/4)*2);
-PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*2, largestElement*0.5);
+PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*2, Math.ceil(largestElement*0.5));
 DrawRefLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/4)*3, GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/4)*3);
-PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*3, largestElement*0.25);
+PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*3, Math.ceil(largestElement*0.25));
 
 //Draw the 13kb limit line
 DrawLimitLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestElement-13), GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestElement-13));
@@ -93,12 +94,12 @@ function PrintAxisHeadings() {
 
 //Legend which specifies the 2x types of graph viewed
 function PrintLegend() {
-    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 30, 5, 'blue');
+    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 30, 5, 'blue', 0);
     ctx.font = "bold 12px Calibri";
     ctx.fillStyle = 'blue';
     ctx.fillText('Uncompressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 35,);
     
-    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 45, 5, 'black');
+    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 45, 5, 'black', 0);
     ctx.font = "bold 12px Calibri";
     ctx.fillStyle = 'black';
     ctx.fillText('Compressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 50,);
@@ -117,9 +118,15 @@ function PrintXAxisValue(x, val, bold) {
 }
 //For printing Y Axis values (kbs)
 function PrintYAxisValue(y, val) { 
-    ctx.font = "10px Calibri";
-    ctx.fillStyle = "#888888";
-    ctx.fillText(val, GRAPH_LEFT - 26, y);
+    //only print if value is high enough to not overlap with the 13 printed
+    if(val > 13+(largestElement/16) || val < 13-(largestElement/16)) {
+        ctx.font = "10px Calibri";
+        ctx.fillStyle = "#888888";
+        ctx.fillText(val, GRAPH_LEFT - 20, y);
+    } else {// else, dont print
+        console.log("Not printing Y-axis value for line at " + val + ", as it overlaps value '13'");
+    }
+        
 }
 
 //Draw a reference line (lighter line) to break up the graph
@@ -152,7 +159,7 @@ function DrawLimitLine(startX, startY, endX, endY) {
 
 //Draw a diamond shape
 //requires x/y location, scale to draw diamond and colour
-function DrawDataDiamond(x, y, size, color) {
+function DrawDataDiamond(x, y, size, color, printVal) {
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(x, (y)-size);
@@ -169,6 +176,12 @@ function DrawDataDiamond(x, y, size, color) {
     ctx.fill();
     ctx.restore();
 
+    if(printVal > 0) {
+        ctx.font = "bold 10px Calibri";
+        ctx.fillStyle = color;
+        ctx.fillText(printVal, x + 4, y - 10);
+    }
+
     ctx.moveTo(x, y); //seems needed to get graph drawing from center of points, fix this
 }
 
@@ -184,9 +197,14 @@ function DrawDataPlot_UNCOMPRESSED() {
     var pointX = GRAPH_LEFT;
     var pointY = (GRAPH_HEIGHT - dataArr[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
     ctx.moveTo(pointX, pointY);
-    DrawDataDiamond(pointX, pointY, 4, 'blue');
-    PrintXAxisValue(pointX, 1, true);
     
+    //print for day 1 condition
+    if(currentDay == 1) {
+        PrintXAxisValue(pointX, 1, true);
+    } else {
+        PrintXAxisValue(pointX, 1, false);
+    }
+    DrawDataDiamond(pointX, pointY, 4, 'blue', dataArr[0]);
     //Loop over each other datapoint
     for(var i = 1; i < arrayLen; i++ ){
         pointX = (GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT; //-40 here scales down the axis to fit
@@ -194,9 +212,13 @@ function DrawDataPlot_UNCOMPRESSED() {
         ctx.lineTo(pointX, pointY);
         //Draw the graph  
         ctx.stroke();
-
-        DrawDataDiamond(pointX, pointY, 4, 'blue');
-        PrintXAxisValue(pointX, i+1, false);
+        
+        if(i+1 == currentDay) {
+            PrintXAxisValue(pointX, i+1, true);
+        } else {
+            PrintXAxisValue(pointX, i+1, false);
+        }
+        DrawDataDiamond(pointX, pointY, 4, 'blue', dataArr[i]);
         //console.log("checking value: " + i);
     }
 }
@@ -213,9 +235,8 @@ function DrawDataPlot_OPTIMIZED() {
     var pointX = GRAPH_LEFT;
     var pointY = (GRAPH_HEIGHT - dataArrOp[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
     ctx.moveTo(pointX, pointY);
-    DrawDataDiamond(pointX, pointY, 4, 'black');
-    PrintXAxisValue(pointX, 1, true);
-    
+    //print for day 1 condition
+    DrawDataDiamond(pointX, pointY, 4, 'black', dataArrOp[0]);
     //Loop over each other datapoint
     for(var i = 1; i < arrayLen; i++ ){
         pointX = (GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT; //-40 here scales down the axis to fit
@@ -224,9 +245,8 @@ function DrawDataPlot_OPTIMIZED() {
         //Draw the graph  
         ctx.stroke();
 
-        DrawDataDiamond(pointX, pointY, 4, 'black');
-        PrintXAxisValue(pointX, i+1, false);
-        //console.log("checking value: " + i);
+        DrawDataDiamond(pointX, pointY, 4, 'black', dataArrOp[i]);
+
     }
 }
 
@@ -244,5 +264,5 @@ function FindLargestElement() {
     //TODO if largest point below 13, set 13kb as the upper limit of the graph
     //TODO if largest point is above maximum, trim
 
-    console.log("Largest data-point in array is " + largestElement + "kb, on day " + (pos+1));
+    console.log("Largest data-point in array is " + largestElement + "kb, on day " + (pos+1) + " - scaling accordingly.");
 }
