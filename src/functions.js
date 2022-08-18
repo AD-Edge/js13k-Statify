@@ -19,13 +19,13 @@ var GRAPH_HEIGHT = GRAPH_BOTTOM - GRAPH_TOP;
 var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
 //Setup test/demo data
-// var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
-// var dataArrOp = [ 10, 12, 27, 24, 12, 12, 13, 9, 6, 5, 9, 10, 10, 10, 12, 8 , 7, 6, 7, 8 ];
+var dataArr = [ 20, 26, 45, 36, 25, 25, 26, 19, 12, 13, 16, 18, 18, 18, 22, 15, 12, 10, 11, 13 ];
+var dataArrOp = [ 10, 12, 27, 24, 12, 12, 13, 9, 6, 5, 9, 10, 10, 10, 12, 8 , 7, 6, 7, 8 ];
 
 //Setup current user data
 //TODO - generate these arrays automatically via batch script, manually input for now
-var dataArr = [ 45, 51, 23, 24];
-var dataArrOp = [ 11, 12, 7, 7 ];
+// var dataArr = [ 45, 51, 23, 24];
+// var dataArrOp = [ 11, 12, 7, 7 ];
 //other data required
 var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
