@@ -29,9 +29,9 @@ var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 var dataArr = [ 45, 51, 23, 24, 27, 29 ];
 var dataArrOp = [ 11, 12, 7, 7, 9, 9];
 //other data required
+var incDay = 0; //current day, start at day 1 (0)
 var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
-var currentDay = 0;
 
 //Initial process of data
 FindLargestElement();
@@ -64,37 +64,53 @@ PrintYAxisValue(GRAPH_TOP + (GRAPH_HEIGHT/4)*3, Math.ceil(largestElement*0.25));
 DrawLimitLine(GRAPH_LEFT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestElement-13), GRAPH_RIGHT, GRAPH_TOP + (GRAPH_HEIGHT/largestElement) * (largestElement-13));
 
 //Draw graph titles and text and legend
-PrintAxisHeadings();
 PrintAxisValues();
 PrintLegend();
 
 //todo instantiate a loop which slowly displays all values
-var inc = 0;
-const renderAnim = setInterval(LoopRenderGraph, 200);
+const renderAnim = setInterval(LoopRenderGraph, 300);
 
 /////////////////////////////////////////////////////
 //STATIFY FUNCTIONS
 /////////////////////////////////////////////////////
 
 function LoopRenderGraph() {
-    if(inc == dataArr.length+1) {
-        for(var i = inc-1; i < arrayLen; i++) { //print remaining days
-            PrintXAxisValue((GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT, i+1, false);
+    
+    //Clear Canvas
+    ctxU.clearRect( 0, 0, canvasUnder.width, canvasUnder.height);
+    
+    //Jump to final day, if we're at the end of the array
+    //Otherwise, draw each day individually
+    if(incDay == dataArr.length) {
+        DrawDataPlot_UNCOMPRESSED(incDay-1, true);
+        DrawDataPlot_OPTIMIZED(incDay-1);
+        
+        //draw remaining day values
+        for(var i = incDay; i < arrayLen; i++) {
+            if(i == dataArr.length-1) {
+                PrintXAxisValue((GRAPH_RIGHT-40) / (arrayLen) * (i) + GRAPH_LEFT, i+1, true);
+            } else {
+                PrintXAxisValue((GRAPH_RIGHT-40) / (arrayLen) * (i) + GRAPH_LEFT, i+1, false);
+            }
         }
+        incDay = arrayLen-1;
+        console.log(incDay);    
+        PrintAxisHeadings();
+        
         //end interval
         clearInterval(renderAnim);
         return;
     } else {
-        currentDay = inc;
-        //Clear Canvas
-        ctxU.clearRect( 0, 0, canvasUnder.width, canvasUnder.height);
         //Draw the uncompressed data graph
-        DrawDataPlot_UNCOMPRESSED(inc);
+        DrawDataPlot_UNCOMPRESSED(incDay, false);
         //Draw the optimized data graph
-        DrawDataPlot_OPTIMIZED(inc);
-        console.log(inc);    
-        inc++;
+        DrawDataPlot_OPTIMIZED(incDay);
+        
+        console.log(incDay);    
+        PrintAxisHeadings();
     }
+
+    incDay++; //new day each run
 }
 
 //Prints Axis headings
@@ -105,20 +121,20 @@ function PrintAxisValues() {
     ctx.fillText("0", GRAPH_LEFT - 20, GRAPH_BOTTOM);
 }
 function PrintAxisHeadings() {
-    ctx.font = "bold 18px Calibri";
-    ctx.fillStyle = "#000000";
-    ctx.fillText("kb", GRAPH_LEFT - 52, GRAPH_HEIGHT/2 + GRAPH_TOP);
-    ctx.fillText("Days 1-31", GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 40);
+    ctxU.font = "bold 18px Calibri";
+    ctxU.fillStyle = "#000000";
+    ctxU.fillText("kb", GRAPH_LEFT - 52, GRAPH_HEIGHT/2 + GRAPH_TOP);
+    ctxU.fillText("Days 1-" + (incDay+1), GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 40);
 }
 
 //Legend which specifies the 2x types of graph viewed
 function PrintLegend() {
-    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 30, 5, 'blue', 0);
+    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 30, 5, 'blue', 0, ctx);
     ctx.font = "bold 12px Calibri";
     ctx.fillStyle = 'blue';
     ctx.fillText('Uncompressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 35,);
     
-    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 45, 5, 'black', 0);
+    DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 45, 5, 'black', 0, ctx);
     ctx.font = "bold 12px Calibri";
     ctx.fillStyle = 'black';
     ctx.fillText('Compressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 50,);
@@ -178,35 +194,36 @@ function DrawLimitLine(startX, startY, endX, endY) {
 
 //Draw a diamond shape
 //requires x/y location, scale to draw diamond and colour
-function DrawDataDiamond(x, y, size, color, printVal) {
-    ctxU.save();
-    ctxU.beginPath();
-    ctxU.moveTo(x, (y)-size);
+function DrawDataDiamond(x, y, size, color, printVal, context) {
+    context.save();
+    context.beginPath();
+    context.moveTo(x, (y)-size);
     // top left edge
-    ctxU.lineTo(x - size, (y + size)-size);
+    context.lineTo(x - size, (y + size)-size);
     // bottom left edge
-    ctxU.lineTo(x, (y + size*2) - size);
+    context.lineTo(x, (y + size*2) - size);
     // bottom right edge
-    ctxU.lineTo(x + size, (y + size) - size);
+    context.lineTo(x + size, (y + size) - size);
     // closing the path automatically creates
     // the top right edge
-    ctxU.closePath();
-    ctxU.fillStyle = color;
-    ctxU.fill();
-    ctxU.restore();
+    context.closePath();
+    context.fillStyle = color;
+    context.fill();
+    context.restore();
 
     if(printVal > 0) {
-        ctxU.font = "bold 10px Calibri";
-        ctxU.fillStyle = color;
-        ctxU.fillText(printVal, x + 4, y - 10);
+        context.font = "bold 10px Calibri";
+        context.fillStyle = color;
+        context.fillText(printVal, x + 4, y - 10);
     }
 
-    ctxU.moveTo(x, y); //seems needed to get graph drawing from center of points, fix this
+    context.moveTo(x, y); //seems needed to get graph drawing from center of points, fix this
 }
 
 //Plots the data from dataArr
 //Uncompressed (blue line) data
-function DrawDataPlot_UNCOMPRESSED(max) {
+//**also draws bold day */
+function DrawDataPlot_UNCOMPRESSED(max, highlightFinal) {
     ctxU.beginPath();
     ctxU.lineJoin = "round";
     ctxU.setLineDash([5, 15]);
@@ -214,31 +231,40 @@ function DrawDataPlot_UNCOMPRESSED(max) {
 
     //Add first point in the graph
     var pointX = GRAPH_LEFT;
-    var pointY = (GRAPH_HEIGHT - dataArr[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
+    var pointY = (GRAPH_HEIGHT - dataArr[0] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
     ctxU.moveTo(pointX, pointY);
-    
-    //print for day 1 condition
-    if(currentDay == 1) {
+    //print bold for day 1 condition
+    if(incDay == 0) {
         PrintXAxisValue(pointX, 1, true);
     } else {
         PrintXAxisValue(pointX, 1, false);
     }
-    DrawDataDiamond(pointX, pointY, 4, 'blue', dataArr[0]);
-    //Loop over each other datapoint
-    for(var i = 1; i < max; i++ ){
-        pointX = (GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT; //-40 here scales down the axis to fit
-        pointY = (GRAPH_HEIGHT - dataArr[i] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
-        ctxU.lineTo(pointX, pointY);
-        //Draw the graph  
-        ctxU.stroke();
-        
-        if(i+1 == currentDay) {
-            PrintXAxisValue(pointX, i+1, true);
-        } else {
-            PrintXAxisValue(pointX, i+1, false);
+    DrawDataDiamond(pointX, pointY, 4, 'blue', dataArr[0], ctxU);
+
+    //if beyond day 1 (0), and into day 2 (1) handle more days
+    if(incDay >= 1) { 
+        //Loop over each other datapoint
+        for(var i = 0; i < max; i++ ){
+            pointX = (GRAPH_RIGHT-40) / (arrayLen+1) * (i+1) + GRAPH_LEFT; //-40 here scales down the axis to fit
+            pointY = (GRAPH_HEIGHT - dataArr[i+1] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
+            ctxU.lineTo(pointX, pointY);
+            //Draw the graph  
+            ctxU.stroke();
+            //draw day number dynamically (bold or normal)
+            if(i+1 == incDay) {
+                PrintXAxisValue(pointX, i+2, true);
+            } else {
+                console.log("data array length: " + dataArr.length + " val: " + (i+2));
+                if(highlightFinal && i+2 == dataArr.length) {
+                    PrintXAxisValue(pointX, i+2, true);
+                } else {
+                    PrintXAxisValue(pointX, i+2, false);
+                }
+            }
+            DrawDataDiamond(pointX, pointY, 4, 'blue', dataArr[i+1], ctxU);
+            //console.log("checking value: " + i);
         }
-        DrawDataDiamond(pointX, pointY, 4, 'blue', dataArr[i]);
-        //console.log("checking value: " + i);
+
     }
 }
 
@@ -252,20 +278,24 @@ function DrawDataPlot_OPTIMIZED(max) {
 
     //Add first point in the graph
     var pointX = GRAPH_LEFT;
-    var pointY = (GRAPH_HEIGHT - dataArrOp[ 0 ] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
+    var pointY = (GRAPH_HEIGHT - dataArrOp[0] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
     ctxU.moveTo(pointX, pointY);
-    //print for day 1 condition
-    DrawDataDiamond(pointX, pointY, 4, 'black', dataArrOp[0]);
-    //Loop over each other datapoint
-    for(var i = 1; i < max; i++ ){
-        pointX = (GRAPH_RIGHT-40) / (arrayLen) * i + GRAPH_LEFT; //-40 here scales down the axis to fit
-        pointY = (GRAPH_HEIGHT - dataArrOp[i] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
-        ctxU.lineTo(pointX, pointY);
-        //Draw the graph  
-        ctxU.stroke();
-
-        DrawDataDiamond(pointX, pointY, 4, 'black', dataArrOp[i]);
-
+    //print bold for day 1 condition
+    DrawDataDiamond(pointX, pointY, 4, 'black', dataArrOp[0], ctxU);
+    
+    //if beyond day 1 (0), and into day 2 (1) handle more days
+    if(incDay >= 1) { 
+        //Loop over each other datapoint
+        for(var i = 0; i < max; i++ ){
+            pointX = (GRAPH_RIGHT-40) / (arrayLen+1) * (i+1) + GRAPH_LEFT; //-40 here scales down the axis to fit
+            pointY = (GRAPH_HEIGHT - dataArrOp[i+1] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
+            ctxU.lineTo(pointX, pointY);
+            //Draw the graph  
+            ctxU.stroke();
+            
+            DrawDataDiamond(pointX, pointY, 4, 'black', dataArrOp[i+1], ctxU);
+            //console.log("checking value: " + i);
+        }
     }
 }
 
