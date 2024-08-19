@@ -38,7 +38,7 @@ var dataArrOp = [
                 2.73, 
                 6.8,
                 9.5, 
-                2.6, 
+                10.4, 
                 11.9, 
                 5.87, 
             ];
@@ -144,7 +144,7 @@ function PrintAxisValues() {
 function PrintAxisHeadings() {
     ctxU.font = "bold 18px Calibri";
     ctxU.fillStyle = "#000000";
-    ctxU.fillText("kb", GRAPH_LEFT - 52, GRAPH_HEIGHT/2 + GRAPH_TOP);
+    ctxU.fillText("KB", GRAPH_LEFT - 52, GRAPH_HEIGHT/2 + GRAPH_TOP);
     ctxU.fillText("Days 1-" + (incDay+1), GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 40);
 }
 
