@@ -26,11 +26,32 @@ var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
 //Setup current user data
 //TODO - generate these arrays automatically via batch script, manually input for now
-var dataArr = [ 45, 51, 23, 24, 27, 29 ];
-var dataArrOp = [ 11, 12, 7, 7, 9, 9];
+var dataArr = [ 
+                6,    
+                14.8,
+                22.1, 
+                24.2, 
+                31.5, 
+                34, //34.2 
+            ];
+var dataArrOp = [ 
+                2.73, 
+                6.8,
+                9.5, 
+                2.6, 
+                11.9, 
+                5.87, 
+            ];
+
+//From JS13k 2022
+// var dataArr = [ 45, 51, 23, 24, 26.6, 29, 30, 31.3, 32, 32.4, ];
+// var dataArrOp = [ 11, 12, 7, 7, 7.8, 9.2, 8, 8, 10, 10, ];
+
+// var dataArr = [ 45, 51, 23, 24, 26.6, 29, 30, 31.3, 32, 32.4];
+// var dataArrOp = [ 11, 12, 7, 7, 7.8, 9.2, 8, 8, 10, 10 ];
 //other data required
 var incDay = 0; //current day, start at day 1 (0)
-var arrayLen = 31; //set manually here to 31 days //dataArr.length;  
+var arrayLen = 10; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
 
 //Initial process of data
@@ -226,7 +247,7 @@ function DrawDataDiamond(x, y, size, color, printVal, context) {
 function DrawDataPlot_UNCOMPRESSED(max, highlightFinal) {
     ctxU.beginPath();
     ctxU.lineJoin = "round";
-    ctxU.setLineDash([5, 15]);
+    ctxU.setLineDash([5, 5]);
     ctxU.strokeStyle = "blue";
 
     //Add first point in the graph
@@ -248,7 +269,7 @@ function DrawDataPlot_UNCOMPRESSED(max, highlightFinal) {
             pointX = (GRAPH_RIGHT-40) / (arrayLen+1) * (i+1) + GRAPH_LEFT; //-40 here scales down the axis to fit
             pointY = (GRAPH_HEIGHT - dataArr[i+1] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
             ctxU.lineTo(pointX, pointY);
-            //Draw the graph  
+            //Draw the graph
             ctxU.stroke();
             //draw day number dynamically (bold or normal)
             if(i+1 == incDay) {
