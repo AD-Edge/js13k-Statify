@@ -144,7 +144,7 @@ function PrintAxisValues() {
 function PrintAxisHeadings() {
     ctxU.font = "bold 18px Calibri";
     ctxU.fillStyle = "#000000";
-    ctxU.fillText("KB", GRAPH_LEFT - 52, GRAPH_HEIGHT/2 + GRAPH_TOP);
+    ctxU.fillText("KB", GRAPH_LEFT - 48, GRAPH_HEIGHT/2 + GRAPH_TOP);
     ctxU.fillText("Days 1-" + (incDay+1), GRAPH_RIGHT - GRAPH_WIDTH/2 - 20, GRAPH_BOTTOM + 40);
 }
 
@@ -167,7 +167,8 @@ function PrintXAxisValue(x, val, bold) {
         ctxU.font = "bold 12px Calibri";
         ctxU.fillStyle = "#000000";
     } else {
-        ctxU.font = "10px Calibri";
+        ctxU.font = "bold 12px Calibri";
+        // ctxU.font = "10px Calibri";
         ctxU.fillStyle = "#888888";
     }
     ctxU.fillText(val, x, GRAPH_BOTTOM + 14);
@@ -266,7 +267,7 @@ function DrawDataPlot_UNCOMPRESSED(max, highlightFinal) {
     if(incDay >= 1) { 
         //Loop over each other datapoint
         for(var i = 0; i < max; i++ ){
-            pointX = (GRAPH_RIGHT-40) / (arrayLen+1) * (i+1) + GRAPH_LEFT; //-40 here scales down the axis to fit
+            pointX = (GRAPH_RIGHT-40) / (arrayLen) * (i+1) + GRAPH_LEFT; //-40 here scales down the axis to fit
             pointY = (GRAPH_HEIGHT - dataArr[i+1] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
             ctxU.lineTo(pointX, pointY);
             //Draw the graph
@@ -308,7 +309,7 @@ function DrawDataPlot_OPTIMIZED(max) {
     if(incDay >= 1) { 
         //Loop over each other datapoint
         for(var i = 0; i < max; i++ ){
-            pointX = (GRAPH_RIGHT-40) / (arrayLen+1) * (i+1) + GRAPH_LEFT; //-40 here scales down the axis to fit
+            pointX = (GRAPH_RIGHT-40) / (arrayLen) * (i+1) + GRAPH_LEFT; //-40 here scales down the axis to fit
             pointY = (GRAPH_HEIGHT - dataArrOp[i+1] / largestElement * GRAPH_HEIGHT) + GRAPH_TOP;
             ctxU.lineTo(pointX, pointY);
             //Draw the graph  
