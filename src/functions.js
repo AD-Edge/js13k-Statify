@@ -26,21 +26,29 @@ var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 
 //Setup current user data
 //TODO - generate these arrays automatically via batch script, manually input for now
-var dataArr = [ 
-                6,    
+var dataArr = [
+                6,
                 14.8,
-                22.1, 
-                24.2, 
-                31.5, 
-                34, //34.2 
+                22.1,
+                24.2,
+                31.5,
+                37.4,
+                38.3,
+                40,
+                43.3,
+                45,
             ];
-var dataArrOp = [ 
-                2.73, 
+var dataArrOp = [
+                2.73,
                 6.8,
-                9.5, 
-                10.4, 
-                11.9, 
-                5.87, 
+                9.5,
+                10.4,
+                11.9,
+                6.76,
+                7.3,
+                7.77,
+                8.14,
+                6.19,
             ];
 
 //From JS13k 2022
