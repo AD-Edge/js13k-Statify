@@ -6,6 +6,6 @@ Statify is custom app to visilize various points of data important to a data-lim
 
 Created by Alex Delderfield, July-August 2022
 
-Example data:
+Example data: 
 
-![example](doc/StatifyEnd2024.png)
+![example](doc/StatifyEnd2024.png) 
