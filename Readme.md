@@ -8,4 +8,4 @@ Created by Alex Delderfield, July-August 2022
 
 Example data:
 
-![example](doc/statify_example.png)
+![example](doc/StatifyEnd2024.png)
