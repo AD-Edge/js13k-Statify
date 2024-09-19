@@ -2,10 +2,10 @@
 // Built using HTML/Canvas/JS
 // First Created By Alex Delderfield, 2022
 // https://twitter.com/Alex_ADEdge
-
 /////////////////////////////////////////////////////
 //Graphing Setup
 /////////////////////////////////////////////////////
+
 var canvas = document.getElementById( "canvasMain" );
 var ctx = canvas.getContext( "2d" );
 var canvasUnder = document.getElementById( "canvasUnder" );
@@ -27,28 +27,48 @@ var GRAPH_WIDTH = GRAPH_RIGHT - GRAPH_LEFT;
 //Setup current user data
 //TODO - generate these arrays automatically via batch script, manually input for now
 var dataArr = [
-                6,
-                14.8,
-                22.1,
-                24.2,
-                31.5,
-                37.4,
-                38.3,
-                40,
-                43.3,
-                45,
+                6,14.8,22.1,24.2,31.5,37.4,38.3,40,43.3,45,48.8,70.6,72.6,76,
+                4,
+                14,
+                37,
+                52.3,
+                60,
+                63.8, //20
+                66,
+                83,
+                90,
+                95,
+                96,
+                99.7,
+                100,
+                106,
+                121,
+                125,
+                136, // 31
+                107, //final
+
             ];
 var dataArrOp = [
-                2.73,
-                6.8,
+                2.73,6.8,9.5,10.4,11.9,6.76,7.3,7.77,8.14,6.19,6.64,8.88,9.14,9.61,
+                1.7,
+                3.91,
+                4.77,
+                6.85,
+                7.41,
+                8.93, //20
                 9.5,
-                10.4,
-                11.9,
-                6.76,
-                7.3,
-                7.77,
-                8.14,
-                6.19,
+                10.9,
+                11,
+                12.4,
+                12.6,
+                12.8,
+                12.7,
+                13.2,
+                14.2,
+                15.1,
+                17.3, // 31
+                13.3 //final
+                
             ];
 
 //From JS13k 2022
@@ -59,7 +79,7 @@ var dataArrOp = [
 // var dataArrOp = [ 11, 12, 7, 7, 7.8, 9.2, 8, 8, 10, 10 ];
 //other data required
 var incDay = 0; //current day, start at day 1 (0)
-var arrayLen = 10; //set manually here to 31 days //dataArr.length;  
+var arrayLen = 32; //set manually here to 31 days //dataArr.length;  
 var largestElement = 0;
 
 //Initial process of data
@@ -161,12 +181,12 @@ function PrintLegend() {
     DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 30, 5, 'blue', 0, ctx);
     ctx.font = "bold 12px Calibri";
     ctx.fillStyle = 'blue';
-    ctx.fillText('Uncompressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 35,);
+    ctx.fillText('Unoptimized', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 35,);
     
     DrawDataDiamond(GRAPH_WIDTH * 0.95, GRAPH_BOTTOM + 45, 5, 'black', 0, ctx);
     ctx.font = "bold 12px Calibri";
     ctx.fillStyle = 'black';
-    ctx.fillText('Compressed', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 50,);
+    ctx.fillText('Optimized', GRAPH_WIDTH * 0.96, GRAPH_BOTTOM + 50,);
 }
 
 //For printing X Axis values (days)
